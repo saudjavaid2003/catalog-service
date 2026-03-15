@@ -1,10 +1,10 @@
 import winston from "winston";
-import { Config } from ".";
+// import { Config } from "."; 
 
 const logger = winston.createLogger({
     level: "info",
     defaultMeta: {
-        serviceName: "auth-service",
+        serviceName: "catalog -service",
     },
     format: winston.format.combine(
         winston.format.timestamp(),
