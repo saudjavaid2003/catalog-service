@@ -6,12 +6,14 @@
     "outDir": "./dist",
     "rootDir": "./",
     "baseUrl": "./",
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    // "allowImportingTsExtensions": true,
+
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+
     "strict": false,
     "sourceMap": true,
     "resolveJsonModule": true

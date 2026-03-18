@@ -15,7 +15,7 @@
   "type": "commonjs",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "nodemon",
+    "dev": "nodemon src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
@@ -26,6 +26,7 @@
     "config": "^4.4.1",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "express-validator": "^7.3.1",
     "http-errors": "^2.0.0",
     "js-yaml": "^4.1.1",
     "mongoose": "^9.3.0",
