@@ -16,8 +16,8 @@ const categoryController = new CategoryController(categoryService, logger);
 
 router.post(
     "/",
-    // authenticate,
-    // canAccess([Roles.ADMIN]),
+    authenticate,
+    canAccess([Roles.ADMIN]),
     categoryValidator,
     asyncWrapper(categoryController.create),
 );

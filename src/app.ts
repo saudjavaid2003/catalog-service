@@ -4,8 +4,11 @@ import { Request, Response, NextFunction } from "express";
 import createHttpError, { HttpError } from "http-errors";
 import config from "config";
 import categoryRouter from "./category/category-router";
+import { cookie } from "express-validator";
+import cookieParser from "cookie-parser";
 const app = express();
 app.use(express.json());
+app.use(cookieParser())
 
 app.get("/",async  (req: Request, res: Response,next: NextFunction) => {
    res.send(config.get("server.port"))
