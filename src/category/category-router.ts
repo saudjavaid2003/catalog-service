@@ -22,15 +22,15 @@ router.post(
     asyncWrapper(categoryController.create),
 );
 
-// router.patch(
-//     "/:id",
-//     authenticate,
-//     canAccess([Roles.ADMIN]),
-//     categoryUpdateValidator,
-//     asyncWrapper(categoryController.update),
-// );
+router.patch(
+    "/:id",
+    authenticate,
+    canAccess([Roles.ADMIN]),
+    categoryUpdateValidator,
+    asyncWrapper(categoryController.update),
+);
 
-// router.get("/", asyncWrapper(categoryController.index));
-// router.get("/:categoryId", asyncWrapper(categoryController.getOne));
+router.get("/", asyncWrapper(categoryController.index));
+router.get("/:categoryId", asyncWrapper(categoryController.getOne));
 
 export default router;
