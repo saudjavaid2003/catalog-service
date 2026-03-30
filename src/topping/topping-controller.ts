@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { FileStorage } from "../common/types/storage";
 import { ToppingService } from "./topping-service";
 import { CreataeRequestBody, Topping, ToppingEvents } from "./topping-types";
-import { MessageProducerBroker } from "../common/types/broker";
+// import { MessageProducerBroker } from "../common/types/broker"; // Kafka disabled
 
 export class ToppingController {
     constructor(
         private storage: FileStorage,
         private toppingService: ToppingService,
-        private broker: MessageProducerBroker,
+        // private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
     ) {}
 
     create = async (
@@ -22,22 +22,18 @@ export class ToppingController {
             const image = req.files!.image as UploadedFile;
             const fileUuid = uuidv4();
 
-            // todo: add error handling
             await this.storage.upload({
                 filename: fileUuid,
                 fileData: image.data.buffer as any,
             });
 
-            // todo: add error handling
             const savedTopping = await this.toppingService.create({
                 ...req.body,
                 image: fileUuid,
                 tenantId: req.body.tenantId,
             } as Topping);
-            // todo: add logging
 
-            // Send topping to kafka.
-            // todo: move topic name to the config
+            /* // 2. Disabled Kafka Message for Topping Creation
             await this.broker.sendMessage(
                 "topping",
                 JSON.stringify({
@@ -49,6 +45,7 @@ export class ToppingController {
                     },
                 }),
             );
+            */
 
             res.json({ id: savedTopping._id });
         } catch (err) {
@@ -62,7 +59,6 @@ export class ToppingController {
                 req.query.tenantId as string,
             );
 
-            // todo: add error handling
             const readyToppings = toppings.map((topping) => {
                 return {
                     id: topping._id,

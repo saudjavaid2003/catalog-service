@@ -10,14 +10,14 @@ import { UploadedFile } from "express-fileupload";
 import { AuthRequest } from "../common/types";
 import { Roles } from "../common/constants";
 import mongoose from "mongoose";
-import { MessageProducerBroker } from "../common/types/broker";
+// import { MessageProducerBroker } from "../common/types/broker"; // Kafka Import
 import { mapToObject } from "../utils";
 
 export class ProductController {
     constructor(
         private productService: ProductService,
         private storage: FileStorage,
-        private broker: MessageProducerBroker,
+        // private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
@@ -29,7 +29,6 @@ export class ProductController {
         const image = req.files!.image as UploadedFile;
         const imageName = uuidv4();
 
-        // FIX: Using .buffer with 'as any' to bypass strict type checking
         await this.storage.upload({
             filename: imageName,
             fileData: image.data.buffer as any,
@@ -60,7 +59,7 @@ export class ProductController {
             product as unknown as Product,
         );
 
-        // Send product to kafka.
+        /* // 2. Disabled Kafka Message for Creation
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
@@ -68,14 +67,12 @@ export class ProductController {
                 data: {
                     id: newProduct._id,
                     priceConfiguration: mapToObject(
-                        newProduct.priceConfiguration as unknown as Map<
-                            string,
-                            any
-                        >,
+                        newProduct.priceConfiguration as unknown as Map<string, any>,
                     ),
                 },
             }),
         );
+        */
 
         res.json({ id: newProduct._id });
     };
@@ -86,7 +83,6 @@ export class ProductController {
             return next(createHttpError(400, result.array()[0].msg as string));
         }
 
-        // FIX: Cast productId as string to resolve string | string[] error
         const { productId } = req.params as { productId: string };
 
         const product = await this.productService.getProduct(productId);
@@ -97,12 +93,7 @@ export class ProductController {
         if ((req as AuthRequest).auth.role !== Roles.ADMIN) {
             const tenant = (req as AuthRequest).auth.tenant;
             if (product.tenantId !== tenant) {
-                return next(
-                    createHttpError(
-                        403,
-                        "You are not allowed to access this product",
-                    ),
-                );
+                return next(createHttpError(403, "You are not allowed to access this product"));
             }
         }
 
@@ -111,11 +102,9 @@ export class ProductController {
 
         if (req.files?.image) {
             oldImage = product.image;
-
             const image = req.files.image as UploadedFile;
             imageName = uuidv4();
 
-            // FIX: Using .buffer with 'as any'
             await this.storage.upload({
                 filename: imageName,
                 fileData: image.data.buffer as any,
@@ -150,7 +139,8 @@ export class ProductController {
             productToUpdate,
         );
 
-        // Send product to kafka.
+        /*
+        // 3. Disabled Kafka Message for Update
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
@@ -158,36 +148,25 @@ export class ProductController {
                 data: {
                     id: updatedProduct._id,
                     priceConfiguration: mapToObject(
-                        updatedProduct.priceConfiguration as unknown as Map<
-                            string,
-                            any
-                        >,
+                        updatedProduct.priceConfiguration as unknown as Map<string, any>,
                     ),
                 },
             }),
         );
+        */
 
         res.json({ id: productId });
     };
 
     index = async (req: Request, res: Response) => {
         const { q, tenantId, categoryId, isPublish } = req.query;
-
         const filters: Filter = {};
 
-        if (isPublish === "true") {
-            filters.isPublish = true;
-        }
-
+        if (isPublish === "true") filters.isPublish = true;
         if (tenantId) filters.tenantId = tenantId as string;
 
-        if (
-            categoryId &&
-            mongoose.Types.ObjectId.isValid(categoryId as string)
-        ) {
-            filters.categoryId = new mongoose.Types.ObjectId(
-                categoryId as string,
-            );
+        if (categoryId && mongoose.Types.ObjectId.isValid(categoryId as string)) {
+            filters.categoryId = new mongoose.Types.ObjectId(categoryId as string);
         }
 
         const products = await this.productService.getProducts(
@@ -195,20 +174,16 @@ export class ProductController {
             filters,
             {
                 page: req.query.page ? parseInt(req.query.page as string) : 1,
-                limit: req.query.limit
-                    ? parseInt(req.query.limit as string)
-                    : 10,
+                limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
             },
         );
 
-        const finalProducts = (products.data as Product[]).map(
-            (product: Product) => {
-                return {
-                    ...product,
-                    image: this.storage.getObjectUri(product.image),
-                };
-            },
-        );
+        const finalProducts = (products.data as Product[]).map((product: Product) => {
+            return {
+                ...product,
+                image: this.storage.getObjectUri(product.image),
+            };
+        });
 
         res.json({
             data: finalProducts,

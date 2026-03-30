@@ -10,18 +10,18 @@ import { ProductService } from "./product-service";
 import { S3Storage } from "../common/services/S3Storage";
 import createHttpError from "http-errors";
 import updateProductValidator from "./update-product-validator";
-import { createMessageProducerBroker } from "../common/factories/brokerFactory";
+// import { createMessageProducerBroker } from "../common/factories/brokerFactory"; // Kafka disabled
 
 const router = express.Router();
 
 const productService = new ProductService();
 const s3Storage = new S3Storage();
-const broker = createMessageProducerBroker();
+// const broker = createMessageProducerBroker(); // Kafka disabled
 
 const productController = new ProductController(
     productService,
     s3Storage,
-    broker,
+    // broker, // Pass this back once you enable Kafka
 );
 
 router.post(
