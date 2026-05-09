@@ -11,19 +11,6 @@ export class KafkaProducerBroker implements MessageProducerBroker {
             brokers,
         };
 
-        if (process.env.NODE_ENV === "production") {
-            kafkaConfig = {
-                ...kafkaConfig,
-                ssl: config.get("kafka.ssl"),
-                connectionTimeout: 45000,
-                sasl: {
-                    mechanism: "plain",
-                    username: config.get("kafka.sasl.username"),
-                    password: config.get("kafka.sasl.password"),
-                },
-            };
-        }
-
         const kafka = new Kafka(kafkaConfig);
         this.producer = kafka.producer();
     }

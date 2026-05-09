@@ -12,12 +12,12 @@ import { Roles } from "../common/constants";
 import mongoose from "mongoose";
 // import { MessageProducerBroker } from "../common/types/broker"; // Kafka Import
 import { mapToObject } from "../utils";
-
+import { MessageProducerBroker } from "../common/types/broker"; // Kafka Import
 export class ProductController {
     constructor(
         private productService: ProductService,
         private storage: FileStorage,
-        // private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
+        private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
@@ -59,7 +59,7 @@ export class ProductController {
             product as unknown as Product,
         );
 
-        /* // 2. Disabled Kafka Message for Creation
+ 
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
@@ -72,7 +72,7 @@ export class ProductController {
                 },
             }),
         );
-        */
+        
 
         res.json({ id: newProduct._id });
     };
@@ -139,8 +139,7 @@ export class ProductController {
             productToUpdate,
         );
 
-        /*
-        // 3. Disabled Kafka Message for Update
+
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
@@ -153,7 +152,7 @@ export class ProductController {
                 },
             }),
         );
-        */
+        
 
         res.json({ id: productId });
     };
