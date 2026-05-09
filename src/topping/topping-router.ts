@@ -9,17 +9,17 @@ import createHttpError from "http-errors";
 import createToppingValidator from "./create-topping-validator";
 import { ToppingService } from "./topping-service";
 import { ToppingController } from "./topping-controller";
-// import { createMessageProducerBroker } from "../common/factories/brokerFactory" // Kafka disabled
+import { createMessageProducerBroker } from "../common/factories/brokerFactory" // Kafka disabled
 
 const router = express.Router();
 
 const toppingService = new ToppingService();
-// const broker = createMessageProducerBroker(); // Kafka disabled
+const broker = createMessageProducerBroker(); // Kafka disabled
 
 const toppingController = new ToppingController(
     new S3Storage(),
     toppingService,
-    // broker, // Pass this back once you want Kafka active
+    broker, // Pass this back once you want Kafka active
 );
 
 router.post(

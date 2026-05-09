@@ -4,13 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { FileStorage } from "../common/types/storage";
 import { ToppingService } from "./topping-service";
 import { CreataeRequestBody, Topping, ToppingEvents } from "./topping-types";
-// import { MessageProducerBroker } from "../common/types/broker"; // Kafka disabled
+import { MessageProducerBroker } from "../common/types/broker"; // Kafka disabled
 
 export class ToppingController {
     constructor(
         private storage: FileStorage,
         private toppingService: ToppingService,
-        // private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
+        private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
     ) {}
 
     create = async (
@@ -33,7 +33,7 @@ export class ToppingController {
                 tenantId: req.body.tenantId,
             } as Topping);
 
-            /* // 2. Disabled Kafka Message for Topping Creation
+         // 2. Disabled Kafka Message for Topping Creation
             await this.broker.sendMessage(
                 "topping",
                 JSON.stringify({
@@ -45,7 +45,7 @@ export class ToppingController {
                     },
                 }),
             );
-            */
+            
 
             res.json({ id: savedTopping._id });
         } catch (err) {
