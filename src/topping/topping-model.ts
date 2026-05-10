@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Topping } from "./topping-types";
+// todo : u are storing toppings per tenant for the moment okay but u have to make them per product 
 
 const toppingSchema = new mongoose.Schema<Topping>(
     {

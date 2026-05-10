@@ -12,46 +12,45 @@ export class ToppingController {
         private toppingService: ToppingService,
         private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
     ) {}
+create = async (
+    req: Request<object, object, CreataeRequestBody>,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        console.log("=== DEBUG ===");
+        console.log("req.files →", req.files);
+        console.log("req.body →", req.body);
+        console.log("=============");
 
-    create = async (
-        req: Request<object, object, CreataeRequestBody>,
-        res: Response,
-        next: NextFunction,
-    ) => {
-        try {
-            const image = req.files!.image as UploadedFile;
-            const fileUuid = uuidv4();
+        const image = req.files!.image as UploadedFile;
+        const fileUuid = uuidv4();
 
-            await this.storage.upload({
-                filename: fileUuid,
-                fileData: image.data.buffer as any,
-            });
+        await this.storage.upload({
+            filename: fileUuid,
+            fileData: image.data.buffer as any,
+        });
 
-            const savedTopping = await this.toppingService.create({
-                ...req.body,
-                image: fileUuid,
-                tenantId: req.body.tenantId,
-            } as Topping);
+        const savedTopping = await this.toppingService.create({
+            ...req.body,
+            image: fileUuid,
+            tenantId: req.body.tenantId,
+        } as Topping);
 
-         // 2. Disabled Kafka Message for Topping Creation
-            await this.broker.sendMessage(
-                "topping",
-                JSON.stringify({
-                    // event_type: ToppingEvents.TOPPING_CREATE,
-                    
-                        id: savedTopping._id,
-                        price: savedTopping.price,
-                        tenantId: savedTopping.tenantId,
-                
-                }),
-            );
-            
+        await this.broker.sendMessage(
+            "topping",
+            JSON.stringify({
+                id: savedTopping._id,
+                price: savedTopping.price,
+                tenantId: savedTopping.tenantId,
+            }),
+        );
 
-            res.json({ id: savedTopping._id });
-        } catch (err) {
-            return next(err);
-        }
-    };
+        res.json({ id: savedTopping._id });
+    } catch (err) {
+        return next(err);
+    }
+};
 
     get = async (req: Request, res: Response, next: NextFunction) => {
         try {

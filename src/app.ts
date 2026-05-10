@@ -11,9 +11,11 @@ import toppingRouter from "./topping/topping-router";
 import productRouter from "./product/product-route";
 
 const app = express();
+app.use(express.json());
 
 const ALLOWED_DOMAINS = [
     config.get("frontend.adminUI"),
+    config.get("frontend.clientUi")
 ];
 
 app.use(
@@ -23,7 +25,6 @@ app.use(
     }),
 );
 
-app.use(express.json());
 app.use(cookieParser());
 
 // Health Check / Root

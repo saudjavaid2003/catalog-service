@@ -4,7 +4,7 @@ export interface PriceConfiguration {
         availableOptions: string[];
     };
 }
-
+// u are accepting any key above fix this later it is a todo 
 export interface Attribute {
     name: string;
     widgetType: "switch" | "radio";
