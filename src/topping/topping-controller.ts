@@ -39,10 +39,13 @@ create = async (
 
         await this.broker.sendMessage(
             "topping",
-            JSON.stringify({
-                id: savedTopping._id,
-                price: savedTopping.price,
-                tenantId: savedTopping.tenantId,
+                JSON.stringify({
+                    event_type: ToppingEvents.TOPPING_CREATE,
+                    data: {
+                        id: savedTopping._id,
+                        price: savedTopping.price,
+                        tenantId: savedTopping.tenantId,
+                    }
             }),
         );
 
