@@ -63,7 +63,7 @@ export class ProductController {
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
-                // event_type: ProductEvents.PRODUCT_CREATE,
+                event_type: ProductEvents.PRODUCT_CREATE,
               
                     id: newProduct._id,
                     priceConfiguration: mapToObject(
@@ -143,8 +143,7 @@ export class ProductController {
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
-                // event_type: ProductEvents.PRODUCT_UPDATE,
-                
+                event_type: ProductEvents.PRODUCT_UPDATE,
                     id: updatedProduct._id,
                     priceConfiguration: mapToObject(
                         updatedProduct.priceConfiguration as unknown as Map<string, any>,
