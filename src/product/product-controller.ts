@@ -10,21 +10,26 @@ import { UploadedFile } from "express-fileupload";
 import { AuthRequest } from "../common/types";
 import { Roles } from "../common/constants";
 import mongoose from "mongoose";
-// import { MessageProducerBroker } from "../common/types/broker"; // Kafka Import
 import { mapToObject } from "../utils";
-import { MessageProducerBroker } from "../common/types/broker"; // Kafka Import
+import { MessageProducerBroker } from "../common/types/broker";
+
 export class ProductController {
     constructor(
         private productService: ProductService,
         private storage: FileStorage,
-        private broker: MessageProducerBroker, // 1. Disabled Kafka Broker
+        private broker: MessageProducerBroker,
     ) {}
 
     create = async (req: Request, res: Response, next: NextFunction) => {
+        console.log("🔥 CREATE ENDPOINT HIT");
+
         const result = validationResult(req);
         if (!result.isEmpty()) {
+            console.log("❌ VALIDATION FAILED", result.array());
             return next(createHttpError(400, result.array()[0].msg as string));
         }
+
+        console.log("✅ VALIDATION PASSED");
 
         const image = req.files!.image as UploadedFile;
         const imageName = uuidv4();
@@ -33,6 +38,8 @@ export class ProductController {
             filename: imageName,
             fileData: image.data.buffer as any,
         });
+
+        console.log("✅ IMAGE UPLOADED");
 
         const {
             name,
@@ -59,20 +66,26 @@ export class ProductController {
             product as unknown as Product,
         );
 
- 
+        console.log("✅ PRODUCT SAVED TO DB", newProduct._id);
+        console.log("📤 SENDING TO KAFKA →", JSON.stringify({
+            event_type: ProductEvents.PRODUCT_CREATE,
+            data: { id: newProduct._id }
+        }));
+
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
                 event_type: ProductEvents.PRODUCT_CREATE,
-              
+                data: {
                     id: newProduct._id,
                     priceConfiguration: mapToObject(
                         newProduct.priceConfiguration as unknown as Map<string, any>,
                     ),
-                
+                },
             }),
         );
-        
+
+        console.log("✅ KAFKA MESSAGE SENT");
 
         res.json({ id: newProduct._id });
     };
@@ -139,19 +152,18 @@ export class ProductController {
             productToUpdate,
         );
 
-
         await this.broker.sendMessage(
             "product",
             JSON.stringify({
                 event_type: ProductEvents.PRODUCT_UPDATE,
+                data: {
                     id: updatedProduct._id,
                     priceConfiguration: mapToObject(
                         updatedProduct.priceConfiguration as unknown as Map<string, any>,
                     ),
-                
+                },
             }),
         );
-        
 
         res.json({ id: productId });
     };
