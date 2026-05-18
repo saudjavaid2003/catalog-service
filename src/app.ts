@@ -15,7 +15,7 @@ app.use(express.json());
 
 const ALLOWED_DOMAINS = [
     config.get("frontend.adminUI"),
-    config.get("frontend.clientUi")
+    config.get("frontend.clientUI")
 ];
 
 app.use(
