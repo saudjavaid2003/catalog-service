@@ -6,7 +6,7 @@ let messageProducer: MessageProducerBroker | null = null;
 
 export const createMessageProducerBroker = (): MessageProducerBroker => {
     // making singletone
-    if (!messageProducer) {
+      if (!messageProducer) {
         messageProducer = new KafkaProducerBroker(
             "catalog-service",
             config.get("kafka.broker"),

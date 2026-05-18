@@ -16,6 +16,7 @@ const startServer = async () => {
         messageProducerBroker = createMessageProducerBroker();
 
         await messageProducerBroker.connect();
+        logger.info("Connected to Kafka successfully");
 
         app.listen(PORT, () => logger.info(`Listening on port ${PORT}`));
     } catch (err: unknown) {
