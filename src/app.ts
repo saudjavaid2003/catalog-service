@@ -23,7 +23,7 @@ app.use(
         origin: ALLOWED_DOMAINS as string[],
         credentials: true,
     }),
-);
+);// kush nai 
 
 app.use(cookieParser());
 
